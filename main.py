@@ -1,6 +1,8 @@
 import pygame
 from pygame import mixer
 import constants
+from functions import scale_img
+from character import Character
 
 pygame.init()
 
@@ -26,6 +28,19 @@ moving_down = False
 # Text font
 font = pygame.font.Font("assets/fonts/Atariclassic.ttf", 20)
 
+animation_types = ["idle", "run"]
+player_animations = []
+for animation in animation_types:
+    temp_list = []
+    for i in range(4):
+        img = pygame.image.load(f"assets/images/characters/elf/{animation}/{i}.png").convert_alpha()
+        img = scale_img(img, constants.SCALE)
+        temp_list.append(img)
+    player_animations.append(temp_list)
+
+# Create player
+player = Character("Hero", x=200, y=200, health=100, player_animations=player_animations, size=1)
+
 # Main Game Loop
 run = True
 while run:
@@ -40,7 +55,15 @@ while run:
             screen.fill(constants.MENU_BG)
         else:
             screen.fill(constants.BG)
-    
+
+            if player.alive:
+
+                # Update all objects
+                player.update()
+                
+            # Draw objects on screen
+            player.draw(screen)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
