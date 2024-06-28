@@ -17,3 +17,32 @@ Need 3 main things:
     game window
     game loop
     event handler
+
+
+Development Process:
+    Setup Game Loop
+    Create player
+    Keyboard inputs and Player Movement
+    Sprites and Animation
+    Adding Multiple Animation Types (Idle, Run, Attack, etc.)
+    Additional Characters (NPCs, enemies, bosses)
+    Add weapons (bow, sword, etc.)
+    Attack animation (arrow, slice, spell, etc.)
+    Creating enemies in game
+    Damage text
+    Player health display
+    world items (coins / potions)
+    Setup Game levels
+        create tile maps
+        load data from files
+        scrolling camera (maybe lock player to center)
+        automated level generation
+        collisions
+    Enemy/NPC AI
+    Other game features
+        Multiple game levels / level transitions
+        screen fade effect (maybe level up effect - yellow lines moving up screen or out from player)
+        game over screen
+        buttons (menu, pause, etc.)
+        game menu
+        music and game sounds

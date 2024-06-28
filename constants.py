@@ -1,0 +1,39 @@
+# Game parameters
+FPS = 60
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+# Scaling
+SCALE = 3
+BUTTON_SCALE = 1
+WEAPON_SCALE = 1.5
+ITEM_SCALE = 3
+POTION_SCALE = 2
+FIREBALL_SCALE = 1
+
+# Game Speeds
+SPEED = 5
+ARROW_SPEED = 10
+FIREBALL_SPEED = 4
+ENEMY_SPEED = 4
+OFFSET = 12
+
+# Tile / map parameters
+TILE_SIZE = 16 * SCALE
+TILE_TYPES = 18
+ROWS = 150
+COLUMNS = 150
+SCROLL_THRESH = 200
+
+# Enemy collisions / attack ranges
+RANGE = 50
+ATTACK_RANGE = 60
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+PINK = (235, 65, 54)
+RED = (255, 0, 0)
+BG = (40, 25, 25)
+MENU_BG = (130, 0, 0)
+PANEL = (50, 50, 50)
