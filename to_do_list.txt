@@ -21,8 +21,8 @@ Need 3 main things:
 
 Development Process:
     [X] Setup Game Loop
-    [-] Create player
-    [-] Keyboard inputs and Player Movement
+    [X] Create player
+    [X] Keyboard inputs and Player Movement
     [-] Sprites and Animation
     [-] Adding Multiple Animation Types (Idle, Run, Attack, etc.)
     [-] Additional Characters (NPCs, enemies, bosses)
@@ -46,3 +46,5 @@ Development Process:
         [-] buttons (menu, pause, etc.)
         [-] game menu
         [-] music and game sounds
+        [-] Add pop up character sheet (part of character class? new class?)
+        [-] Add pop up inventory

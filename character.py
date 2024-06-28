@@ -1,6 +1,7 @@
 import pygame, constants
+from typing import Union
 
-class Character():
+class Character:
     def __init__(self, name: str, x: int, y: int, health: int, player_animations, size) -> None:
         self.name: str = name
         self.level: int = 1
@@ -20,6 +21,57 @@ class Character():
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = pygame.Rect(0, 0, constants.TILE_SIZE * size, constants.TILE_SIZE * size)
         self.rect.center = (x, y)
+    
+    def move(self, dx: int, dy: int) -> list[int]:
+        screen_scroll = [0, 0]
+        # Check if moving
+        self.running = False
+        if dx != 0 or dy != 0:
+            self.running = True
+        
+        # Control facing direction
+        if dx < 0: 
+            self.flip = True
+        if dx > 0:
+            self.flip = False
+
+        # Check for collision with map in x direction
+        self.rect.x += dx
+        # for obstacle in obstacle_tiles:
+        #     # Check for collisions
+        #     if obstacle[1].colliderect(self.rect):
+        #         # Check which side the collision is from
+        #         if dx > 0:
+        #             self.rect.right = obstacle[1].left
+        #         if dx < 0:
+        #             self.rect.left = obstacle[1].right
+        self.rect.y += dy
+        # for obstacle in obstacle_tiles:
+        #     # Check for collisions
+        #     if obstacle[1].colliderect(self.rect):
+        #         # Check which side the collision is from
+        #         if dy > 0:
+        #             self.rect.bottom = obstacle[1].top
+        #         if dy < 0:
+        #             self.rect.top = obstacle[1].bottom
+
+        # Update scroll based on player position
+        # Move camera left and right
+        if self.rect.right > (constants.SCREEN_WIDTH - constants.SCROLL_THRESH):
+            screen_scroll[0] = (constants.SCREEN_WIDTH - constants.SCROLL_THRESH) - self.rect.right
+            self.rect.right = constants.SCREEN_WIDTH - constants.SCROLL_THRESH
+        if self.rect.left < (constants.SCROLL_THRESH):
+            screen_scroll[0] = constants.SCROLL_THRESH - self.rect.left
+            self.rect.left = constants.SCROLL_THRESH
+        # Move camera up and down
+        if self.rect.bottom > (constants.SCREEN_HEIGHT - constants.SCROLL_THRESH):
+            screen_scroll[1] = (constants.SCREEN_HEIGHT - constants.SCROLL_THRESH) - self.rect.bottom
+            self.rect.bottom = constants.SCREEN_HEIGHT - constants.SCROLL_THRESH
+        if self.rect.top < (constants.SCROLL_THRESH):
+            screen_scroll[1] = constants.SCROLL_THRESH - self.rect.top
+            self.rect.top = constants.SCROLL_THRESH
+        
+        return screen_scroll
 
     def update(self):
         # Check if player has died
