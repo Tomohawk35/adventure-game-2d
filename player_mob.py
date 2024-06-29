@@ -3,7 +3,7 @@ from typing import Union
 from character import Character
 
 class PlayerMob:
-    def __init__(self, player, x: int, y: int, health: int, player_animations, size) -> None:
+    def __init__(self, player: Character, x: int, y: int, player_animations, size) -> None:
         self.player: Character = player
         self.level: int = 1
         self.flip: bool = False
@@ -12,7 +12,6 @@ class PlayerMob:
         self.action: int = 0 # 0: Idle, 1: Run, 2: Attack
         self.update_time = pygame.time.get_ticks()
         self.running: bool = False
-        self.health: int = health
         self.alive: bool = True
         self.hit: bool = False
         self.last_hit = pygame.time.get_ticks()
@@ -74,11 +73,11 @@ class PlayerMob:
         
         return screen_scroll
 
-    def update(self):
+    def update(self, player):
         # Check if player has died
-        if self.health <= 0:
-            self.health = 0
-            self.alive = False
+        if player.health <= 0:
+            player.health = 0
+            player.alive = False
         
         # Timer to reset player taking a hit
         hit_cooldown = 100

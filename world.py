@@ -10,7 +10,7 @@ class World():
         self.obstacle_tiles = []
         self.exit_tile = None
         self.item_list = []
-        self.player = None
+        self.player_mob = None
         self.character_list = []
 
     def process_data(self, data, tile_list, item_images, player_animations, mob_animations, player):
@@ -41,8 +41,8 @@ class World():
                     # self.item_list.append(potion)
                     tile_data[0] = tile_list[0] # Replace tile image with plain floor tile
                 elif tile == 11:
-                    player = PlayerMob(player, image_x, image_y, player_animations, 0, False, 1)
-                    self.player = player
+                    player_mob = PlayerMob(player, image_x, image_y, player_animations, 1)
+                    self.player_mob = player_mob
                     tile_data[0] = tile_list[0] # Replace tile image with plain floor tile
                 elif tile >= 12 and tile <= 16:
                     enemy = Monster(image_x, image_y, 100, mob_animations, tile - 11, False, 1)

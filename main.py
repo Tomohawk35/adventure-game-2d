@@ -1,11 +1,13 @@
 import pygame
 from pygame import mixer
+import csv
 import constants
 from functions import scale_img, draw_text, draw_info, reset_level
 from character import Character
 from player_mob import PlayerMob
 from damage_text import DamageText
 from screen_fade import ScreenFade
+from world import World
 
 mixer.init()
 pygame.init()
@@ -117,14 +119,15 @@ with open(f"levels/level{level}_data.csv", newline="") as csvfile:
         for y, tile in enumerate(row):
             world_data[x][y] = int(tile)
 
-world = World()
-world.process_data(world_data, tile_list, item_images, mob_animations)
 
 
 # Create player
-player = Character("Hero", x=constants.SCREEN_WIDTH // 2, y=constants.SCREEN_HEIGHT // 2, health=100, player_animations=player_animations, size=1)
-# TODO: create player mob
-player_sprite = PlayerMob(player, x=constants.SCREEN_WIDTH // 2, y=constants.SCREEN_HEIGHT // 2, health=100, player_animations=player_animations, size=1)
+player = Character("Hero", character_class=0)
+# TODO: create character class selector
+player_sprite = PlayerMob(player, x=constants.SCREEN_WIDTH // 2, y=constants.SCREEN_HEIGHT // 2, player_animations=player_animations, size=1)
+
+world = World()
+world.process_data(world_data, tile_list, item_images, player_animations, mob_animations, player)
 
 # Main Game Loop
 run = True
