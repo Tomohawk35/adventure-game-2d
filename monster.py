@@ -61,7 +61,7 @@ class Monster:
                 if dy < 0:
                     self.rect.top = obstacle[1].bottom
 
-    def ai(self, player, obstacle_tiles, screen_scroll, fireball_image):
+    def ai(self, player_mob, obstacle_tiles, screen_scroll, fireball_image):
         clipped_line = ()
         stun_cooldown = 100
         ai_dx = 0
@@ -72,21 +72,21 @@ class Monster:
         self.rect.y += screen_scroll[1]
 
         # Create a line of sight from the enemy to the player
-        line_of_sight = ((self.rect.centerx, self.rect.centery), (player.rect.centerx, player.rect.centery))
+        line_of_sight = ((self.rect.centerx, self.rect.centery), (player_mob.rect.centerx, player_mob.rect.centery))
         # Check if line of sight passes through an obstacle tile
         for obstacle in obstacle_tiles:
             if obstacle[1].clipline(line_of_sight):
                 clipped_line = obstacle[1].clipline(line_of_sight)
         # Check distance to player
-        dist = math.sqrt(((self.rect.centerx - player.rect.centerx) ** 2) + ((self.rect.centery - player.rect.centery) ** 2))
+        dist = math.sqrt(((self.rect.centerx - player_mob.rect.centerx) ** 2) + ((self.rect.centery - player_mob.rect.centery) ** 2))
         if not clipped_line and dist > constants.RANGE:
-            if self.rect.centerx > player.rect.centerx:
+            if self.rect.centerx > player_mob.rect.centerx:
                 ai_dx = -constants.ENEMY_SPEED
-            if self.rect.centerx < player.rect.centerx:
+            if self.rect.centerx < player_mob.rect.centerx:
                 ai_dx = constants.ENEMY_SPEED
-            if self.rect.centery > player.rect.centery:
+            if self.rect.centery > player_mob.rect.centery:
                 ai_dy = -constants.ENEMY_SPEED
-            if self.rect.centery < player.rect.centery:
+            if self.rect.centery < player_mob.rect.centery:
                 ai_dy = constants.ENEMY_SPEED
         
         if self.alive:
@@ -94,10 +94,10 @@ class Monster:
                 # Move toward player
                 self.move(ai_dx, ai_dy, obstacle_tiles)
                 # Attack player
-                if dist < constants.ATTACK_RANGE and player.hit == False:
-                    player.health -= 10
-                    player.hit = True
-                    player.last_hit = pygame.time.get_ticks()
+                if dist < constants.ATTACK_RANGE and player_mob.hit == False:
+                    player_mob.health -= 10
+                    player_mob.hit = True
+                    player_mob.last_hit = pygame.time.get_ticks()
                 # Boss enemies shoot fireballs
                 fireball_cooldown = 700
                 if self.boss:

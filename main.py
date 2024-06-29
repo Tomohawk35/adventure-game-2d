@@ -1,9 +1,13 @@
 import pygame
 from pygame import mixer
 import constants
-from functions import scale_img
+from functions import scale_img, draw_text, draw_info, reset_level
 from character import Character
+from player_mob import PlayerMob
+from damage_text import DamageText
+from screen_fade import ScreenFade
 
+mixer.init()
 pygame.init()
 
 screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
@@ -30,6 +34,56 @@ moving_down = False
 # Text font
 font = pygame.font.Font("assets/fonts/Atariclassic.ttf", 20)
 
+# Load music and sounds
+pygame.mixer.music.load("assets/audio/music.wav")
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play(-1, 0.0, 5000)
+shot_fx = pygame.mixer.Sound("assets/audio/arrow_shot.mp3")
+shot_fx.set_volume(0.5)
+hit_fx = pygame.mixer.Sound("assets/audio/arrow_hit.wav")
+hit_fx.set_volume(0.5)
+coin_fx = pygame.mixer.Sound("assets/audio/coin.wav")
+coin_fx.set_volume(0.5)
+heal_fx = pygame.mixer.Sound("assets/audio/heal.wav")
+heal_fx.set_volume(0.5)
+
+# Load button images
+start_img = scale_img(pygame.image.load("assets/images/buttons/button_start.png").convert_alpha(), constants.BUTTON_SCALE)
+exit_img = scale_img(pygame.image.load("assets/images/buttons/button_exit.png").convert_alpha(), constants.BUTTON_SCALE)
+restart_img = scale_img(pygame.image.load("assets/images/buttons/button_restart.png").convert_alpha(), constants.BUTTON_SCALE)
+resume_img = scale_img(pygame.image.load("assets/images/buttons/button_resume.png").convert_alpha(), constants.BUTTON_SCALE)
+
+# Load heart images 
+heart_empty = scale_img(pygame.image.load("assets/images/items/heart_empty.png").convert_alpha(), constants.ITEM_SCALE)
+heart_half = scale_img(pygame.image.load("assets/images/items/heart_half.png").convert_alpha(), constants.ITEM_SCALE)
+heart_full = scale_img(pygame.image.load("assets/images/items/heart_full.png").convert_alpha(), constants.ITEM_SCALE)
+
+# Load coin images
+coin_images = []
+for x in range(4):
+    img = scale_img(pygame.image.load(f"assets/images/items/coin_f{x}.png").convert_alpha(), constants.ITEM_SCALE)
+    coin_images.append(img)
+    
+# Load potion images
+red_potion = scale_img(pygame.image.load("assets/images/items/potion_red.png").convert_alpha(), constants.POTION_SCALE)
+
+item_images = []
+item_images.append(coin_images)
+item_images.append(red_potion)
+
+# Load weapon images
+bow_image = scale_img(pygame.image.load("assets/images/weapons/bow.png").convert_alpha(), constants.WEAPON_SCALE)
+arrow_image = scale_img(pygame.image.load("assets/images/weapons/arrow.png").convert_alpha(), constants.WEAPON_SCALE)
+fireball_image = scale_img(pygame.image.load("assets/images/weapons/fireball.png").convert_alpha(), constants.FIREBALL_SCALE)
+
+# Load tilemap images
+tile_list = []
+for x in range(constants.TILE_TYPES):
+    tile_image = pygame.image.load(f"assets/images/tiles/{x}.png").convert_alpha()
+    tile_image = pygame.transform.scale(tile_image, (constants.TILE_SIZE, constants.TILE_SIZE))
+    tile_list.append(tile_image)
+
+# Compile animations
 animation_types = ["idle", "run"]
 player_animations = []
 for animation in animation_types:
@@ -50,8 +104,27 @@ for mob in mob_types:
         temp_list.append(img)
     mob_animations.append(temp_list)
 
+# Create empty tile list
+world_data = []
+for row in range(constants.ROWS):
+    r = [-1] * constants.COLUMNS
+    world_data.append(r)
+
+# Load in level data and create world
+with open(f"levels/level{level}_data.csv", newline="") as csvfile:
+    reader = csv.reader(csvfile, delimiter = ",")
+    for x, row in enumerate(reader):
+        for y, tile in enumerate(row):
+            world_data[x][y] = int(tile)
+
+world = World()
+world.process_data(world_data, tile_list, item_images, mob_animations)
+
+
 # Create player
 player = Character("Hero", x=constants.SCREEN_WIDTH // 2, y=constants.SCREEN_HEIGHT // 2, health=100, player_animations=player_animations, size=1)
+# TODO: create player mob
+player_sprite = PlayerMob(player, x=constants.SCREEN_WIDTH // 2, y=constants.SCREEN_HEIGHT // 2, health=100, player_animations=player_animations, size=1)
 
 # Main Game Loop
 run = True
@@ -84,13 +157,13 @@ while run:
                     dy = -constants.SPEED
                 
                 # Move player
-                screen_scroll = player.move(dx, dy)
+                screen_scroll = player_sprite.move(dx, dy)
 
                 # Update all objects
-                player.update()
+                player_sprite.update()
 
             # Draw objects on screen
-            player.draw(screen)
+            player_sprite.draw(screen)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

@@ -18,6 +18,10 @@ Need 3 main things:
     game loop
     event handler
 
+Helpful tools
+Tiled (mapeditor.org) - Helpful for creating map layouts
+
+*** Maybe separate character and UI components from sprite so information is lost between zone transitions
 
 Development Process:
     [X] Setup Game Loop

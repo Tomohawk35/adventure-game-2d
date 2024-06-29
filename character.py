@@ -2,76 +2,27 @@ import pygame, constants
 from typing import Union
 
 class Character:
-    def __init__(self, name: str, x: int, y: int, health: int, player_animations, size) -> None:
+    def __init__(self, name: str, character_class) -> None:
         self.name: str = name
+        self.character_class = character_class
         self.level: int = 1
-        self.flip: bool = False
-        self.animation_list = player_animations
-        self.frame_index: int = 0
-        self.action: int = 0 # 0: Idle, 1: Run, 2: Attack
-        self.update_time = pygame.time.get_ticks()
-        self.running: bool = False
-        self.health: int = health
+        self.experience = 0
+        self.experience_cap = 100 * self.level
+        # Base Stats
+        self.strength: int = 10
+        self.dexterity: int = 10
+        self.intelligence: int = 10
+        # Base Stats
+        self.max_health: int = 10 * self.strength
+        self.health = self.max_health
+        self.attack_damage: int = 20
+        # Statuses
         self.alive: bool = True
         self.hit: bool = False
+        self.stunned: bool = False
         self.last_hit = pygame.time.get_ticks()
         self.last_attack = pygame.time.get_ticks()
-        self.stunned: bool = False
-
-        self.image = self.animation_list[self.action][self.frame_index]
-        self.rect = pygame.Rect(0, 0, constants.TILE_SIZE * size, constants.TILE_SIZE * size)
-        self.rect.center = (x, y)
-    
-    def move(self, dx: int, dy: int) -> list[int]:
-        screen_scroll = [0, 0]
-        # Check if moving
-        self.running = False
-        if dx != 0 or dy != 0:
-            self.running = True
         
-        # Control facing direction
-        if dx < 0: 
-            self.flip = True
-        if dx > 0:
-            self.flip = False
-
-        # Check for collision with map in x direction
-        self.rect.x += dx
-        # for obstacle in obstacle_tiles:
-        #     # Check for collisions
-        #     if obstacle[1].colliderect(self.rect):
-        #         # Check which side the collision is from
-        #         if dx > 0:
-        #             self.rect.right = obstacle[1].left
-        #         if dx < 0:
-        #             self.rect.left = obstacle[1].right
-        self.rect.y += dy
-        # for obstacle in obstacle_tiles:
-        #     # Check for collisions
-        #     if obstacle[1].colliderect(self.rect):
-        #         # Check which side the collision is from
-        #         if dy > 0:
-        #             self.rect.bottom = obstacle[1].top
-        #         if dy < 0:
-        #             self.rect.top = obstacle[1].bottom
-
-        # Update scroll based on player position
-        # Move camera left and right
-        if self.rect.right > (constants.SCREEN_WIDTH - constants.SCROLL_THRESH):
-            screen_scroll[0] = (constants.SCREEN_WIDTH - constants.SCROLL_THRESH) - self.rect.right
-            self.rect.right = constants.SCREEN_WIDTH - constants.SCROLL_THRESH
-        if self.rect.left < (constants.SCROLL_THRESH):
-            screen_scroll[0] = constants.SCROLL_THRESH - self.rect.left
-            self.rect.left = constants.SCROLL_THRESH
-        # Move camera up and down
-        if self.rect.bottom > (constants.SCREEN_HEIGHT - constants.SCROLL_THRESH):
-            screen_scroll[1] = (constants.SCREEN_HEIGHT - constants.SCROLL_THRESH) - self.rect.bottom
-            self.rect.bottom = constants.SCREEN_HEIGHT - constants.SCROLL_THRESH
-        if self.rect.top < (constants.SCROLL_THRESH):
-            screen_scroll[1] = constants.SCROLL_THRESH - self.rect.top
-            self.rect.top = constants.SCROLL_THRESH
-        
-        return screen_scroll
 
     def update(self):
         # Check if player has died
@@ -109,6 +60,18 @@ class Character:
             self.frame_index = 0
             self.update_time = pygame.time.get_ticks()
 
-    def draw(self, surface) -> None:
-        flipped_image = pygame.transform.flip(self.image, self.flip, False)
-        surface.blit(flipped_image, (self.rect.x, self.rect.y - constants.SCALE * constants.OFFSET))
+    def draw(self, surface) -> None: # TODO: Update to draw UI on screen
+        # flipped_image = pygame.transform.flip(self.image, self.flip, False)
+        # surface.blit(flipped_image, (self.rect.x, self.rect.y - constants.SCALE * constants.OFFSET))
+        pass
+
+    def level_up(self) -> None:
+        self.level += 1
+        self.max_health += 20
+        self.health = self.max_health
+        self.attack_damage += 5
+        self.experience = 0
+        self.experience_cap = 100 * self.level
+        print(f"{self.name} has leveled up! Damage and Health have been increased.\n")
+        # if self.level == 3:
+        #     print("New ability unlocked: Kick (K to use)")
