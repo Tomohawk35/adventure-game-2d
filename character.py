@@ -25,7 +25,6 @@ class Character:
         self.stunned: bool = False
         self.last_hit = pygame.time.get_ticks()
         self.last_attack = pygame.time.get_ticks()
-        self.running: bool = False
         
 
     def update(self):
@@ -34,35 +33,10 @@ class Character:
             self.health = 0
             self.alive = False
         
-        # Timer to reset player taking a hit
+        # Timer to reset player taking a hit 
         hit_cooldown = 100
         if self.hit == True and (pygame.time.get_ticks() - self.last_hit) > hit_cooldown:
-            self.hit = False
-
-        # Check what action the player is performing
-        if self.running == True:
-            self.update_action(1) # 1: Run
-        else:
-            self.update_action(0) # 0: Idle
-        
-        animation_cooldown = 70
-        self.image = self.animation_list[self.action][self.frame_index]
-        # Check if enough time has passed since the last update
-        if pygame.time.get_ticks() - self.update_time > animation_cooldown:
-            self.frame_index += 1
-            self.update_time = pygame.time.get_ticks()
-        
-        # Check if animation has finished
-        if self.frame_index >= len(self.animation_list[self.action]):
-            self.frame_index = 0
-
-    def update_action(self, new_action):
-        # Check if the new action is different to the previous one
-        if new_action != self.action:
-            self.action = new_action
-            # Update the animation settings
-            self.frame_index = 0
-            self.update_time = pygame.time.get_ticks()
+            self.hit = False # TODO: Remove hit cooldown? attacks should be tied to attack speed
 
     def draw(self, surface) -> None: # TODO: Update to draw UI on screen
         # flipped_image = pygame.transform.flip(self.image, self.flip, False)

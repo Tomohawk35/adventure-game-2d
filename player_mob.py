@@ -11,11 +11,11 @@ class PlayerMob:
         self.action: int = 0 # 0: Idle, 1: Run, 2: Attack
         self.update_time = pygame.time.get_ticks()
         self.running: bool = False
-        self.alive: bool = True
-        self.hit: bool = False
-        self.last_hit = pygame.time.get_ticks()
-        self.last_attack = pygame.time.get_ticks()
-        self.stunned: bool = False
+        # self.alive: bool = True
+        # self.hit: bool = False
+        # self.last_hit = pygame.time.get_ticks()
+        # self.last_attack = pygame.time.get_ticks()
+        # self.stunned: bool = False
 
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = pygame.Rect(0, 0, constants.TILE_SIZE * size, constants.TILE_SIZE * size)
@@ -27,7 +27,7 @@ class PlayerMob:
         # Check if moving
         self.running = False
         if dx != 0 or dy != 0:
-            self.running = True
+            self.player.running = True
         
         # Control facing direction
         if dx < 0: 
@@ -81,15 +81,6 @@ class PlayerMob:
         return screen_scroll, level_complete
 
     def update(self, player):
-        # Check if player has died
-        if player.health <= 0:
-            player.health = 0
-            player.alive = False
-        
-        # Timer to reset player taking a hit
-        hit_cooldown = 100
-        if self.hit == True and (pygame.time.get_ticks() - self.last_hit) > hit_cooldown:
-            self.hit = False
 
         # Check what action the player is performing
         if self.running == True:

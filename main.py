@@ -29,6 +29,8 @@ character_sheet = False
 inventory = False
 screen_scroll = [0, 0]
 
+game_font = pygame.font.Font("assets/fonts/Atariclassic.ttf", 20)
+
 # Define player movement variables
 moving_left = False
 moving_right = False
@@ -175,8 +177,7 @@ while run:
         else:
             screen.fill(constants.BG)
 
-            if character_sheet:
-                player.show_character_sheet(screen)
+            
 
             if player.alive:
 
@@ -207,15 +208,15 @@ while run:
                 player.update()
                 player_sprite.update(player)
                 # arrow = bow.update(player)
-                if arrow:
-                    arrow_group.add(arrow)
-                    shot_fx.play()
-                for arrow in arrow_group:
-                    damage, damage_pos = arrow.update(screen_scroll, world.obstacle_tiles, enemy_list)
-                    if damage: 
-                        damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), constants.RED)
-                        damage_text_group.add(damage_text)
-                        hit_fx.play()
+                # if arrow:
+                #     arrow_group.add(arrow)
+                #     shot_fx.play()
+                # for arrow in arrow_group:
+                #     damage, damage_pos = arrow.update(screen_scroll, world.obstacle_tiles, enemy_list)
+                #     if damage: 
+                #         damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), constants.RED)
+                #         damage_text_group.add(damage_text)
+                #         hit_fx.play()
                 damage_text_group.update()
                 fireball_group.update(screen_scroll, player)
                 item_group.update(screen_scroll, player, coin_fx, heal_fx)
@@ -232,8 +233,11 @@ while run:
                 fireball.draw(screen)
             damage_text_group.draw(screen)
             item_group.draw(screen)
-            draw_info()
+            draw_info(screen, player, heart_full, heart_half, heart_empty, game_font, level)
+            # def draw_info(screen, player, heart_full, heart_half, heart_empty, font, level):
             # score_coin.draw(screen)
+            if character_sheet:
+                player.show_character_sheet(screen)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

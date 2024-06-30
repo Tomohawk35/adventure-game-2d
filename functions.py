@@ -27,9 +27,9 @@ def draw_info(screen, player, heart_full, heart_half, heart_empty, font, level):
         else:
             screen.blit(heart_empty, (10 + i * 50, 0))
     # Level
-    draw_text(f"LEVEL: {level}", font, constants.WHITE, constants.SCREEN_WIDTH / 2, 15)
+    draw_text(f"LEVEL: {level}", font, constants.WHITE, constants.SCREEN_WIDTH / 2, 15, screen)
     # Show score
-    draw_text(f"X{player.score}", font, constants.WHITE, constants.SCREEN_WIDTH - 100, 15)
+    # draw_text(f"X{player.score}", font, constants.WHITE, constants.SCREEN_WIDTH - 100, 15, screen)
 
 # Function to reset level
 def reset_level(damage_text_group, arrow_group, item_group, fireball_group):
