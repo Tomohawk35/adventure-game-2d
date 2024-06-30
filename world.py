@@ -42,6 +42,7 @@ class World():
                     tile_data[0] = tile_list[0] # Replace tile image with plain floor tile
                 elif tile == 11:
                     player_mob = PlayerMob(player, image_x, image_y, player_animations, 1)
+                    # player_sprite = PlayerMob(player, x=constants.SCREEN_WIDTH // 2, y=constants.SCREEN_HEIGHT // 2, player_animations=player_animations, size=1)
                     self.player_mob = player_mob
                     tile_data[0] = tile_list[0] # Replace tile image with plain floor tile
                 elif tile >= 12 and tile <= 16:
@@ -62,6 +63,7 @@ class World():
             tile[2] += screen_scroll[0]
             tile[3] += screen_scroll[1]
             tile[1].center = (tile[2], tile[3])
+            # tile_data = [image, image_rect, image_x, image_y]
 
     def draw(self, surface):
         for tile in self.map_tiles:

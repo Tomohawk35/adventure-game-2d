@@ -2,6 +2,7 @@ import pygame
 # import weapon
 import constants
 import math
+from player_mob import PlayerMob
 
 class Monster:
     def __init__(self, x: int, y: int, health, mob_animations, monster_type: int, boss: bool, size) -> None:
@@ -61,7 +62,7 @@ class Monster:
                 if dy < 0:
                     self.rect.top = obstacle[1].bottom
 
-    def ai(self, player_mob, obstacle_tiles, screen_scroll, fireball_image):
+    def ai(self, player, player_mob: PlayerMob, obstacle_tiles, screen_scroll, fireball_image):
         clipped_line = ()
         stun_cooldown = 100
         ai_dx = 0
@@ -94,10 +95,10 @@ class Monster:
                 # Move toward player
                 self.move(ai_dx, ai_dy, obstacle_tiles)
                 # Attack player
-                if dist < constants.ATTACK_RANGE and player_mob.hit == False:
-                    player_mob.health -= 10
-                    player_mob.hit = True
-                    player_mob.last_hit = pygame.time.get_ticks()
+                if dist < constants.ATTACK_RANGE and player.hit == False:
+                    player.health -= 10
+                    player.hit = True
+                    player.last_hit = pygame.time.get_ticks()
                 # Boss enemies shoot fireballs
                 fireball_cooldown = 700
                 if self.boss:
@@ -125,11 +126,6 @@ class Monster:
             self.health = 0
             self.alive = False
 
-        # Timer to reset player taking a hit
-        hit_cooldown = 1000
-        if self.char_type == 0:
-            if self.hit == True and (pygame.time.get_ticks() - self.last_hit) > hit_cooldown:
-                    self.hit = False
         # Check what action the player is performing
         if self.running == True:
             self.update_action(1) # 1: Run

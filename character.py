@@ -1,5 +1,8 @@
-import pygame, constants
+import pygame
+from constants import BLACK, WHITE, SHEET_LEFT_COL, SHEET_OFFSET, SCREEN_HEIGHT, SCREEN_WIDTH
 from typing import Union
+from functions import draw_text
+# from game_fonts import large_sheet_font, small_sheet_font
 
 class Character:
     def __init__(self, name: str, character_class) -> None:
@@ -22,6 +25,7 @@ class Character:
         self.stunned: bool = False
         self.last_hit = pygame.time.get_ticks()
         self.last_attack = pygame.time.get_ticks()
+        self.running: bool = False
         
 
     def update(self):
@@ -75,3 +79,16 @@ class Character:
         print(f"{self.name} has leveled up! Damage and Health have been increased.\n")
         # if self.level == 3:
         #     print("New ability unlocked: Kick (K to use)")
+
+
+    def show_character_sheet(self, surface) -> None:
+        small_sheet_font = pygame.font.Font("assets/fonts/Atariclassic.ttf", 12)
+        large_sheet_font = pygame.font.Font("assets/fonts/Atariclassic.ttf", 20)
+        character_sheet = pygame.draw.rect(surface, BLACK, pygame.Rect(SHEET_OFFSET, SHEET_OFFSET, (SCREEN_WIDTH // 2) - 100, SCREEN_HEIGHT - (SHEET_OFFSET * 2)), width=0, border_radius=10)
+        draw_text(f"{self.name}", large_sheet_font, WHITE, SHEET_LEFT_COL, SHEET_OFFSET + 20, surface)
+        draw_text(f"Level: {self.level}", small_sheet_font, WHITE, SHEET_LEFT_COL, SHEET_OFFSET + 50, surface)
+        draw_text(f"Health: {self.health}/{self.max_health}", small_sheet_font, WHITE, SHEET_LEFT_COL, SHEET_OFFSET + 65, surface)
+        draw_text(f"Experience: {self.experience}/{self.experience_cap}", small_sheet_font, WHITE, SHEET_LEFT_COL, SHEET_OFFSET + 80, surface)
+        draw_text(f"Strength: {self.strength}", small_sheet_font, WHITE, SHEET_LEFT_COL, SHEET_OFFSET + 110, surface)
+        draw_text(f"Dexterity: {self.dexterity}", small_sheet_font, WHITE, SHEET_LEFT_COL, SHEET_OFFSET + 125, surface)
+        draw_text(f"Intelligence: {self.intelligence}", small_sheet_font, WHITE, SHEET_LEFT_COL, SHEET_OFFSET + 140, surface)

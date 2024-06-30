@@ -4,10 +4,12 @@ import csv
 import constants
 from functions import scale_img, draw_text, draw_info, reset_level
 from character import Character
-from player_mob import PlayerMob
+# from player_mob import PlayerMob
 from damage_text import DamageText
 from screen_fade import ScreenFade
 from world import World
+from button import Button
+# from game_fonts import game_font
 
 mixer.init()
 pygame.init()
@@ -32,9 +34,6 @@ moving_left = False
 moving_right = False
 moving_up = False
 moving_down = False
-
-# Text font
-font = pygame.font.Font("assets/fonts/Atariclassic.ttf", 20)
 
 # Load music and sounds
 pygame.mixer.music.load("assets/audio/music.wav")
@@ -99,12 +98,16 @@ for animation in animation_types:
 mob_types = ["elf", "imp", "skeleton", "goblin", "muddy", "tiny_zombie", "big_demon"]
 mob_animations = []
 for mob in mob_types:
-    temp_list = []
-    for i in range(4):
-        img = pygame.image.load(f"assets/images/characters/{mob}/{animation}/{i}.png").convert_alpha()
-        img = scale_img(img, constants.SCALE)
-        temp_list.append(img)
-    mob_animations.append(temp_list)
+    animation_list = []
+    for animation in animation_types:
+        # Reset temporary list of images
+        temp_list = []
+        for i in range(4):
+            img = pygame.image.load(f"assets/images/characters/{mob}/{animation}/{i}.png").convert_alpha()
+            img = scale_img(img, constants.SCALE)
+            temp_list.append(img)
+        animation_list.append(temp_list)
+    mob_animations.append(animation_list)
 
 # Create empty tile list
 world_data = []
@@ -124,10 +127,38 @@ with open(f"levels/level{level}_data.csv", newline="") as csvfile:
 # Create player
 player = Character("Hero", character_class=0)
 # TODO: create character class selector
-player_sprite = PlayerMob(player, x=constants.SCREEN_WIDTH // 2, y=constants.SCREEN_HEIGHT // 2, player_animations=player_animations, size=1)
+
 
 world = World()
 world.process_data(world_data, tile_list, item_images, player_animations, mob_animations, player)
+
+# player_sprite = PlayerMob(player, x=constants.SCREEN_WIDTH // 2, y=constants.SCREEN_HEIGHT // 2, player_animations=player_animations, size=1)
+player_sprite = world.player_mob
+
+enemy_list = world.character_list
+
+# Create sprite groups
+damage_text_group = pygame.sprite.Group()
+arrow_group = pygame.sprite.Group()
+item_group = pygame.sprite.Group()
+fireball_group = pygame.sprite.Group()
+
+# score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images, True)
+# item_group.add(score_coin)
+
+# Add items from the world data
+# for item in world.item_list:
+#     item_group.add(item)
+
+# Create screen fades
+intro_fade = ScreenFade(1, constants.BLACK, 4)
+death_fade = ScreenFade(2, constants.PINK, 4)
+
+# Create button
+start_button = Button(constants.SCREEN_WIDTH // 2 - 145, constants.SCREEN_HEIGHT // 2 - 150, start_img)
+exit_button = Button(constants.SCREEN_WIDTH // 2 - 110, constants.SCREEN_HEIGHT // 2 + 50, exit_img)
+restart_button = Button(constants.SCREEN_WIDTH // 2 - 175, constants.SCREEN_HEIGHT // 2 - 50, restart_img)
+resume_button = Button(constants.SCREEN_WIDTH // 2 - 175, constants.SCREEN_HEIGHT // 2 - 150, resume_img)
 
 # Main Game Loop
 run = True
@@ -143,6 +174,9 @@ while run:
             screen.fill(constants.MENU_BG)
         else:
             screen.fill(constants.BG)
+
+            if character_sheet:
+                player.show_character_sheet(screen)
 
             if player.alive:
 
@@ -160,13 +194,46 @@ while run:
                     dy = -constants.SPEED
                 
                 # Move player
-                screen_scroll = player_sprite.move(dx, dy)
+                screen_scroll, level_complete = player_sprite.move(dx, dy, world.obstacle_tiles, world.exit_tile)
 
                 # Update all objects
-                player_sprite.update()
+                world.update(screen_scroll)
+                for enemy in enemy_list:
+                    fireball = enemy.ai(player, player_sprite, world.obstacle_tiles, screen_scroll, fireball_image)
+                    if fireball:
+                        fireball_group.add(fireball)
+                    if enemy.alive:
+                        enemy.update()
+                player.update()
+                player_sprite.update(player)
+                # arrow = bow.update(player)
+                if arrow:
+                    arrow_group.add(arrow)
+                    shot_fx.play()
+                for arrow in arrow_group:
+                    damage, damage_pos = arrow.update(screen_scroll, world.obstacle_tiles, enemy_list)
+                    if damage: 
+                        damage_text = DamageText(damage_pos.centerx, damage_pos.y, str(damage), constants.RED)
+                        damage_text_group.add(damage_text)
+                        hit_fx.play()
+                damage_text_group.update()
+                fireball_group.update(screen_scroll, player)
+                item_group.update(screen_scroll, player, coin_fx, heal_fx)
 
             # Draw objects on screen
+            world.draw(screen)
+            for enemy in enemy_list:
+                enemy.draw(screen)
             player_sprite.draw(screen)
+            # bow.draw(screen)
+            for arrow in arrow_group:
+                arrow.draw(screen)
+            for fireball in fireball_group:
+                fireball.draw(screen)
+            damage_text_group.draw(screen)
+            item_group.draw(screen)
+            draw_info()
+            # score_coin.draw(screen)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -185,9 +252,17 @@ while run:
             if event.key == pygame.K_ESCAPE:
                 pause_game = True
             if event.key == pygame.K_c:
-                character_sheet = True
+                if character_sheet:
+                    character_sheet = False
+                else: 
+                    character_sheet = True
+                print(f"Character Sheet: {character_sheet}")
             if event.key == pygame.K_i:
-                inventory = True
+                if inventory:
+                    inventory = False
+                else: 
+                    inventory = True
+                print(f"Inventory: {inventory}")
 
         # Take keyboard releases
         if event.type == pygame.KEYUP:
@@ -199,10 +274,7 @@ while run:
                 moving_up = False
             if event.key == pygame.K_s:
                 moving_down = False
-            if event.key == pygame.K_c:
-                character_sheet = False
-            if event.key == pygame.K_i:
-                inventory = False
+
 
     pygame.display.update()
     

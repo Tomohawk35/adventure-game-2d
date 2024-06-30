@@ -1,11 +1,10 @@
-import pygame, constants
+import pygame, constants, math
 from typing import Union
 from character import Character
 
 class PlayerMob:
     def __init__(self, player: Character, x: int, y: int, player_animations, size) -> None:
         self.player: Character = player
-        self.level: int = 1
         self.flip: bool = False
         self.animation_list = player_animations
         self.frame_index: int = 0
@@ -22,8 +21,9 @@ class PlayerMob:
         self.rect = pygame.Rect(0, 0, constants.TILE_SIZE * size, constants.TILE_SIZE * size)
         self.rect.center = (x, y)
     
-    def move(self, dx: int, dy: int) -> list[int]:
+    def move(self, dx: int, dy: int, obstacle_tiles, exit_tile = None) -> list[int]:
         screen_scroll = [0, 0]
+        level_complete = False
         # Check if moving
         self.running = False
         if dx != 0 or dy != 0:
@@ -37,23 +37,30 @@ class PlayerMob:
 
         # Check for collision with map in x direction
         self.rect.x += dx
-        # for obstacle in obstacle_tiles:
-        #     # Check for collisions
-        #     if obstacle[1].colliderect(self.rect):
-        #         # Check which side the collision is from
-        #         if dx > 0:
-        #             self.rect.right = obstacle[1].left
-        #         if dx < 0:
-        #             self.rect.left = obstacle[1].right
+        for obstacle in obstacle_tiles:
+            # Check for collisions
+            if obstacle[1].colliderect(self.rect):
+                # Check which side the collision is from
+                if dx > 0:
+                    self.rect.right = obstacle[1].left
+                if dx < 0:
+                    self.rect.left = obstacle[1].right
         self.rect.y += dy
-        # for obstacle in obstacle_tiles:
-        #     # Check for collisions
-        #     if obstacle[1].colliderect(self.rect):
-        #         # Check which side the collision is from
-        #         if dy > 0:
-        #             self.rect.bottom = obstacle[1].top
-        #         if dy < 0:
-        #             self.rect.top = obstacle[1].bottom
+        for obstacle in obstacle_tiles:
+            # Check for collisions
+            if obstacle[1].colliderect(self.rect):
+                # Check which side the collision is from
+                if dy > 0:
+                    self.rect.bottom = obstacle[1].top
+                if dy < 0:
+                    self.rect.top = obstacle[1].bottom
+
+        # Check collision with exit ladder
+        if exit_tile[1].colliderect(self.rect):
+            # Ensure player is close to the center of the exit ladder
+            exit_dist = math.sqrt(((self.rect.centerx - exit_tile[1].centerx) ** 2) + ((self.rect.centery - exit_tile[1].centery) ** 2))
+            if exit_dist < 20:
+                level_complete = True
 
         # Update scroll based on player position
         # Move camera left and right
@@ -71,7 +78,7 @@ class PlayerMob:
             screen_scroll[1] = constants.SCROLL_THRESH - self.rect.top
             self.rect.top = constants.SCROLL_THRESH
         
-        return screen_scroll
+        return screen_scroll, level_complete
 
     def update(self, player):
         # Check if player has died
