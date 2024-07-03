@@ -32,6 +32,7 @@ Development Process:
     [-] Additional Characters (NPCs, enemies, bosses)
     [-] Add weapons (bow, sword, etc.)
     [-] Attack animation (arrow, slice, spell, etc.)
+        [-] Dash move
     [-] Creating enemies in game
     [-] Damage text
     [-] Player health display

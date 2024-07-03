@@ -1,16 +1,18 @@
 import pygame
-from constants import BLACK, WHITE, SHEET_LEFT_COL, SHEET_OFFSET, SCREEN_HEIGHT, SCREEN_WIDTH
+from constants import BLACK, WHITE, GOLD, SHEET_LEFT_COL, SHEET_OFFSET, SCREEN_HEIGHT, SCREEN_WIDTH
 from typing import Union
 from functions import draw_text
+from screen_fade import ScreenFade
 # from game_fonts import large_sheet_font, small_sheet_font
 
 class Character:
-    def __init__(self, name: str, character_class) -> None:
+    def __init__(self, name: str, character_class: str) -> None:
         self.name: str = name
-        self.character_class = character_class
+        self.character_class: str = character_class
         self.level: int = 1
         self.experience = 0
-        self.experience_cap = 100 * self.level
+        # self.experience_cap = 100 * self.level
+        self.experience_cap = 100
         # Base Stats
         self.strength: int = 10
         self.dexterity: int = 10
@@ -28,28 +30,34 @@ class Character:
         
 
     def update(self):
+        leveled_up = False
         # Check if player has died
         if self.health <= 0:
             self.health = 0
             self.alive = False
-        
+        if self.experience >= self.experience_cap:
+            leveled_up = True
+            self.level_up()
+            
         # Timer to reset player taking a hit 
         hit_cooldown = 100
         if self.hit == True and (pygame.time.get_ticks() - self.last_hit) > hit_cooldown:
             self.hit = False # TODO: Remove hit cooldown? attacks should be tied to attack speed
+        return leveled_up
 
     def draw(self, surface) -> None: # TODO: Update to draw UI on screen
         # flipped_image = pygame.transform.flip(self.image, self.flip, False)
         # surface.blit(flipped_image, (self.rect.x, self.rect.y - constants.SCALE * constants.OFFSET))
         pass
 
-    def level_up(self) -> None:
+    def level_up(self) -> bool:
         self.level += 1
         self.max_health += 20
         self.health = self.max_health
         self.attack_damage += 5
         self.experience = 0
-        self.experience_cap = 100 * self.level
+        # self.experience_cap = 100 * self.level
+        self.experience_cap = 100
         print(f"{self.name} has leveled up! Damage and Health have been increased.\n")
         # if self.level == 3:
         #     print("New ability unlocked: Kick (K to use)")

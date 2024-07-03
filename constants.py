@@ -34,6 +34,7 @@ ATTACK_RANGE = 60
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+GOLD = ( 255, 215, 0)
 PINK = (235, 65, 54)
 RED = (255, 0, 0)
 BG = (40, 25, 25)

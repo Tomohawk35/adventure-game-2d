@@ -3,6 +3,7 @@ import pygame
 import constants
 import math
 from player_mob import PlayerMob
+from character import Character
 
 class Monster:
     def __init__(self, x: int, y: int, health, mob_animations, monster_type: int, boss: bool, size) -> None:
@@ -120,11 +121,12 @@ class Monster:
         
         return fireball
     
-    def update(self):
+    def update(self, player: Character):
         # Check if character has died
         if self.health <= 0:
             self.health = 0
             self.alive = False
+            player.experience += 100
 
         # Check what action the player is performing
         if self.running == True:
